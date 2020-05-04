@@ -1,4 +1,16 @@
-def readProp;
+properties = null     
+
+def loadProperties() {
+    node {
+        checkout scm
+        properties = new Properties()
+        File propertiesFile = new File("${workspace}/app.properties")
+        properties.load(propertiesFile.newDataInputStream())
+        echo "Immediate one ${properties.repo}"
+    }
+}
+
+
 pipeline {
     agent {
         docker {
@@ -8,8 +20,12 @@ pipeline {
     }
     stages {
         stage('Read property file') {
-            readProp = readProperties file: 'app.properties'
-            echo """The app name is: ${readProp['deploy.app.name']}"""
+            steps {
+                script {
+                    loadProperties()
+                    echo "Later one ${properties.branch}"
+                }
+            }
         }
         stage('Build') { 
             steps {
