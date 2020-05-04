@@ -1,3 +1,4 @@
+def readProp;
 pipeline {
     agent {
         docker {
@@ -6,6 +7,10 @@ pipeline {
         }
     }
     stages {
+        stage('Read property file') {
+            readProp = readProperties file: 'app.properties'
+            echo """The app name is: ${readProp['deploy.app.name']}"""
+        }
         stage('Build') { 
             steps {
                 sh 'mvn -B -DskipTests clean package' 
